@@ -90,4 +90,4 @@ async def afl(ctx,filename):
 async def ping(ctx):
     await ctx.send('pong!')
 
-bot.run("OTg1NTQ3NDU5NzUxMTg2NDMy.GtLzNh.pqnEN-OZ-UxLcdoitkZabK_tOZv0p1fRzwj7Ic")
+bot.run("")
