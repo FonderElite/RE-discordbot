@@ -31,7 +31,14 @@ async def on_message(message):
         content = await attachment.read()
 
         if file_ext[1] == ".c":
-            print(content)
+            with open(filename,'wb') as f:
+                f.write(content)
+                f.close()
+            os.system(f"gcc {filename} -o {file_ext[0]}.bin")
+            compiled_file = discord.File(f"{file_ext[0]}.bin")
+            await message.channel.send(f"{filename} compiled successfully")
+            await message.channel.send(file=compiled_file)
+
         elif b"ELF" in content:
             # Check if content is hex-encoded
             if content.startswith(b'0x'):
@@ -89,5 +96,3 @@ async def afl(ctx,filename):
 @bot.command()
 async def ping(ctx):
     await ctx.send('pong!')
-
-bot.run("")
