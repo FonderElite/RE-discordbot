@@ -3,10 +3,12 @@ import os
 from discord.ext import commands
 import r2pipe
 
-#test command
+
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
+
+#Process files sent by user
 @bot.event
 async def on_message(message):
     if message.author == bot.user:  # ignore messages sent by the bot itself
