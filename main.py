@@ -1,9 +1,6 @@
-import discord
-import os
+import discord,os,subprocess
 from discord.ext import commands
 import r2pipe
-
-
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
@@ -19,6 +16,12 @@ async def on_message(message):
         await message.channel.send(f'Hello {name}!')
     elif message.content.startswith('!ping'):
         await message.channel.send('Pong!')
+    elif message.content.startswith('!files'):
+        await message.channel.send('Files Listed: ')
+    elif message.content.startswith('!pdf'):
+        await message.channel.send('Function: ')
+    elif message.content.startswith('!afl'):
+     await message.channel.send('[Listed Functions]')
     elif not message.attachments:
         return
     else:
@@ -36,22 +39,55 @@ async def on_message(message):
                 content = bytes.fromhex(content.decode('utf-8'))
 
             # Write binary content to a new file
-            new_filename = filename + '.bin'
-            with open(new_filename, 'wb') as f:
-                f.write(content)
-
-            r2 = r2pipe.open(new_filename)
-            await message.channel.send(f"Successfully wrote binary content to {new_filename}")
-            r2.cmd('aaa')
-            strings_result = r2.cmd("iz")
-            await message.channel.send(strings_result)
-            info_result = r2.cmd("ii")
-            await message.channel.send(info_result)
-
+            elif file_ext[1] == "": 
+                new_filename = file_ext[0] + '.bin'
+                with open(new_filename, 'wb') as f:
+                    f.write(content)
+                    f.close()
+                await message.channel.send(f"Successfully wrote binary content to {new_filename}")
+            else:
+                with open(filename, 'wb') as f:
+                    f.write(content)
+                    f.close()
+                r2 = r2pipe.open(filename)
+                await message.channel.send(f"Successfully wrote binary content to {filename}")
+                r2.cmd('aaa')
+                strings_result = r2.cmd("iz")
+                await message.channel.send(strings_result)
+                info_result = r2.cmd("ii")
+                await message.channel.send(info_result)
     await bot.process_commands(message)  # process any bot commands in the message
+
+@bot.command()
+async def files(ctx):
+    list_cmd = os.popen('ls').read()
+    await ctx.send(list_cmd)
+
+@bot.command()
+async def pdf(ctx,filename,function):
+    r = r2pipe.open(filename)
+    r.cmd('aaa')
+    func = r.cmd(f'pdf @ {function}') # disassamble funtion
+    if len(func) > 2000:
+        # message is too long, create a file object and send it to Discord
+        with open(f'{filename}-{function}',"w") as f:
+            f.write(func)
+            f.close()
+        file = discord.File(f'{filename}-{function}')
+        await ctx.send(file=file)
+    else:
+        await ctx.send(func)
+
+@bot.command()
+async def afl(ctx,filename):
+    r = r2pipe.open(filename)
+    r.cmd('aaa')
+    function_list = r.cmd('afl')
+    await ctx.send(function_list)
+
 
 @bot.command()
 async def ping(ctx):
     await ctx.send('pong!')
 
-bot.run("")
+bot.run("OTg1NTQ3NDU5NzUxMTg2NDMy.GtLzNh.pqnEN-OZ-UxLcdoitkZabK_tOZv0p1fRzwj7Ic")
