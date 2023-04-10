@@ -3,6 +3,8 @@ import os
 from discord.ext import commands
 import r2pipe
 
+#test command
+
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
 @bot.event
