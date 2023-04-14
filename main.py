@@ -6,7 +6,6 @@ from pyExploitDb import PyExploitDb
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
-openai.api_key = "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"
 
 
 # help pages
